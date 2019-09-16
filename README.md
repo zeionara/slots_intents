@@ -1,4 +1,7 @@
 # Intent and Slot-filling on the ATIS dataset task.
+Adapted for tensorflow 2.0 and shortened in comparison to original  
+https://github.com/mohammedterry/slots_intents
+
 
 ## Model architecture
 For this task, a model was trained to jointly predict a sentence's Intent and Slots (entities).  Each word is embedded (using pre-defined word vectors) to capture the word's meaning while a character-level bidirection Long Short-Term Memory(LSTM) Network encodes the word's letters to capture its lexical structure.  
