@@ -1,8 +1,11 @@
-import pickle, tempfile
+import pickle
+import tempfile
+
+from . import crf_layer
+from tensorflow.compat.v1.train import AdamOptimizer
 from tensorflow.keras import Model
-from tensorflow.train import AdamOptimizer
-from tensorflow.keras.layers import Input,Embedding,Dropout,Dense,TimeDistributed,Bidirectional,LSTM,concatenate
-from crf_layer import CRF
+from tensorflow.keras.layers import Input, Embedding, Dropout, Dense, TimeDistributed, Bidirectional, LSTM, concatenate
+
 
 class BiLSTM_CRF():
   
@@ -42,14 +45,14 @@ class BiLSTM_CRF():
     second_bilstm_layer = Dropout(dropout)(second_bilstm_layer)
     bilstm_out = Dense(num_labels)(second_bilstm_layer)
 
-    # feed BiLSTM vectors into CRF
-    crf = CRF(num_labels, name='intent_slot_crf')
-    entities = crf(bilstm_out)
+    # feed BiLSTM vectors into crf_layer.CRF
+    crf_layer.CRF = crf_layer.CRF(num_labels, name='intent_slot_crf_layer.CRF')
+    entities = crf_layer.CRF(bilstm_out)
 
     model = Model(inputs=[words_input, word_chars_input],outputs=[intents, entities])
 
-    loss_f = {'intent_classifier_output': 'categorical_crossentropy','intent_slot_crf': crf.loss}
-    metrics = {'intent_classifier_output': 'categorical_accuracy', 'intent_slot_crf': crf.viterbi_accuracy}
+    loss_f = {'intent_classifier_output': 'categorical_crossentropy','intent_slot_crf_layer.CRF': crf_layer.CRF.loss}
+    metrics = {'intent_classifier_output': 'categorical_accuracy', 'intent_slot_crf_layer.CRF': crf_layer.CRF.viterbi_accuracy}
     model.compile(loss=loss_f, optimizer= AdamOptimizer(), metrics=metrics)
     self.model = model
     

@@ -83,8 +83,8 @@ class ATIS():
       idx_vocab = dict(enumerate({word.lower() for sentence in sentences for word in sentence},start))
       vocab_idx = {v:k for k,v in idx_vocab.items()}
       vectors = [[vocab_idx[word.lower()] for word in sentence] for sentence in sentences]
-      return vectors, vocab_idx, idx_vocab  
-    
+      return vectors, vocab_idx, idx_vocab
+
     def _c_vectors_vocab(self, sentences, start = 0):
       idx_vocab = dict(enumerate({char for sentence in sentences for word in sentence for char in word},start))
       vocab_idx = {v:k for k,v in idx_vocab.items()}
@@ -93,12 +93,12 @@ class ATIS():
 
     def _load(self, train_set, test_set):
       #join train + test data together and split into words,entities,intents
-      words, tokens, entities, intents = list(zip(*train_set + test_set))        
+      words, tokens, entities, intents = list(zip(*train_set + test_set))
 
       #build vocab for each and encode each as categorical vectors
       word_vectors, self.info["word_vocab"], self.info["word_idx"] = self._w_vectors_vocab(tokens, start=2)
       word_vectors = clip_pad(word_vectors, self.info["sentence_length"])
-      
+
       entities_vectors, self.info["entity_vocab"], self.info["entity_idx"] = self._w_vectors_vocab(entities, start=1)
       entities_vectors = clip_pad(entities_vectors, self.info["sentence_length"])
 
@@ -106,9 +106,9 @@ class ATIS():
       intents_vectors = intents_vectors[0]
 
       chars_vectors, self.info["char_vocab"], self.info["char_idx"] = self._c_vectors_vocab(words, start=2)
-      chars_vectors = [clip_pad(word, self.info["word_length"]) for word in chars_vectors]     
-      chars_vectors = clip_pad(chars_vectors,self.info["sentence_length"],pad=[[0]*self.info["word_length"]]) 
-                                     
+      chars_vectors = [clip_pad(word, self.info["word_length"]) for word in chars_vectors]
+      chars_vectors = clip_pad(chars_vectors,self.info["sentence_length"],pad=[[0]*self.info["word_length"]])
+
       #separate train/test data
       train_size, test_size = len(train_set), len(test_set)
       self.data = {

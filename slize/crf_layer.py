@@ -1,4 +1,5 @@
 import tensorflow as tf
+import tensorflow_addons as tfa
 
 class CRF(tf.keras.layers.Layer):
     def __init__(self, num_classes, mode='reg', **kwargs):
@@ -54,14 +55,14 @@ class CRF(tf.keras.layers.Layer):
             sequences = tf.convert_to_tensor(inputs, dtype=self.dtype)
             shape = tf.shape(inputs)
             self.sequence_lengths = tf.ones(shape[0], dtype=tf.int32) * (shape[1])
-        viterbi_sequence, _ = tf.contrib.crf.crf_decode(sequences, self.transitions,
+        viterbi_sequence, _ = tfa.text.crf.crf_decode(sequences, self.transitions,
                                                         self.sequence_lengths)
         output = tf.keras.backend.one_hot(viterbi_sequence, self.output_dim)
         return tf.keras.backend.in_train_phase(sequences, output)
 
     def loss(self, y_true, y_pred):
         y_pred = tf.convert_to_tensor(y_pred, dtype=self.dtype)
-        log_likelihood, self.transitions = tf.contrib.crf.crf_log_likelihood(y_pred,tf.cast(tf.keras.backend.argmax(y_true),dtype=tf.int32),self.sequence_lengths,transition_params=self.transitions)
+        log_likelihood, self.transitions = tfa.text.crf.crf_log_likelihood(y_pred,tf.cast(tf.keras.backend.argmax(y_true),dtype=tf.int32),self.sequence_lengths,transition_params=self.transitions)
         return tf.reduce_mean(-log_likelihood)
 
     def compute_output_shape(self, input_shape):
@@ -77,7 +78,7 @@ class CRF(tf.keras.layers.Layer):
         def accuracy(y_true, y_pred):
             shape = tf.shape(y_pred)
             sequence_lengths = tf.ones(shape[0], dtype=tf.int32) * (shape[1])
-            viterbi_sequence, _ = tf.contrib.crf.crf_decode(y_pred, self.transitions,sequence_lengths)
+            viterbi_sequence, _ = tfa.text.crf.crf_decode(y_pred, self.transitions,sequence_lengths)
             output = tf.keras.backend.one_hot(viterbi_sequence, self.output_dim)
             return tf.keras.metrics.categorical_accuracy(y_true, output)
         accuracy.func_name = 'viterbi_accuracy'

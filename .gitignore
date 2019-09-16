@@ -1,0 +1,5 @@
+build/
+dist/
+slize.egg-info/
+setup.py
+__pycache__/
